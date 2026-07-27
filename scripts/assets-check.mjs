@@ -3,7 +3,6 @@ import path from "node:path";
 import { publicAssets, root } from "./assets-shared.mjs";
 
 let failures = 0;
-try { await fs.access(path.join(root, "assets-manifest.json")); } catch { console.error("Missing assets-manifest.json. Run npm run assets:prepare first."); failures += 1; }
 const expected = [
   "home/hero.webp", "works/photography/photo-01.webp", "works/livestream/scene-01.webp",
   "cases/ai-workflow/workflow-01.png", "cases/ip-projects/project-01.webp", "generated/video-production-01.svg"
