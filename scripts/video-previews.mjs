@@ -11,13 +11,13 @@ const statePath = path.join(root, "video-previews-manifest.json");
 const generatedModule = path.join(root, "src", "data", "video-previews.ts");
 const outputRoot = path.join(root, "public", "assets", "works");
 const sources = [
-  ["video-production-01", "视频制作", "商业视频制作项目 01 .mp4", "video-production"],
+  ["video-production-01", "视频制作", "商业视频制作项目 01.mp4", "video-production"],
   ["video-production-02", "视频制作", "社交媒体短视频项目 02.mp4", "video-production"],
-  ["video-production-03", "视频制作", "活动影像记录项目 03.mp4", "video-production"],
+  ["video-production-03", "视频制作", "品牌视觉包装项目 02.mp4", "video-production"],
   ["video-production-04", "视频制作", "三岔湖-终.mp4", "video-production"],
   ["video-production-05", "视频制作", "白鹤滩-1.mp4", "video-production"],
   ["video-packaging-01", "视频制作", "视频包装与节奏设计 01.mp4", "video-packaging"],
-  ["video-packaging-02", "视频制作", "品牌视觉包装项目 02.mp4", "video-packaging"]
+  ["video-packaging-02", "视频制作", "活动影像记录项目 03.mp4", "video-packaging"]
 ];
 
 async function hasBinary(name) { try { await run(name, ["-version"], { windowsHide: true }); return true; } catch { return false; } }
@@ -35,7 +35,7 @@ const priorById = new Map((prior.records ?? []).map((record) => [record.id, reco
 const records = [];
 for (const [id, folder, filename, outputFolder] of sources) {
   const input = path.join(root, folder, filename); const stat = await fs.stat(input); const output = path.join(outputRoot, outputFolder, `${id}.mp4`); const cover = path.join(outputRoot, outputFolder, `${id}.webp`); const old = priorById.get(id); const base = { id, sourcePath: path.relative(root, input).split(path.sep).join("/"), sourceSizeBytes: stat.size, sourceSizeMB: bytesToMB(stat.size), sourceModifiedMs: stat.mtimeMs, outputPath: publicPath(output), coverPath: publicPath(cover), needsReview: true };
-  if (old?.sourceSizeBytes === stat.size && old?.sourceModifiedMs === stat.mtimeMs && (old.status === "processed" || old.status === "skipped-unchanged") && await fs.access(output).then(() => true).catch(() => false) && await fs.access(cover).then(() => true).catch(() => false)) { records.push({ ...old, status: "skipped-unchanged" }); continue; }
+  if (old?.sourcePath === base.sourcePath && old?.sourceSizeBytes === stat.size && old?.sourceModifiedMs === stat.mtimeMs && (old.status === "processed" || old.status === "skipped-unchanged") && await fs.access(output).then(() => true).catch(() => false) && await fs.access(cover).then(() => true).catch(() => false)) { records.push({ ...old, status: "skipped-unchanged" }); continue; }
   if (!ffmpegAvailable) { records.push({ ...base, status: "unavailable", reason: "FFmpeg and FFprobe are not available; no preview or cover was generated." }); continue; }
   try {
     const media = await probe(input); if (!Number.isFinite(media.duration) || media.duration <= 0) throw new Error("Unable to read a valid video duration."); const previewDuration = Math.min(25, media.duration); const start = await chooseStart(input, media.duration, previewDuration); await fs.mkdir(path.dirname(output), { recursive: true }); const tempOutput = `${output}.tmp.mp4`;
