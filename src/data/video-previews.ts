@@ -5,7 +5,7 @@ export const videoPreviews: Record<string, VideoPreview> = {
   "video-production-01": {
     "previewVideo": "/assets/works/video-production/video-production-01.mp4",
     "poster": "/assets/works/video-production/video-production-01.webp",
-    "previewDurationLabel": "25 秒作品节选",
+    "previewDurationLabel": "23 秒作品节选",
     "needsReview": true
   },
   "video-production-02": {
@@ -17,7 +17,7 @@ export const videoPreviews: Record<string, VideoPreview> = {
   "video-production-03": {
     "previewVideo": "/assets/works/video-production/video-production-03.mp4",
     "poster": "/assets/works/video-production/video-production-03.webp",
-    "previewDurationLabel": "23 秒作品节选",
+    "previewDurationLabel": "25 秒作品节选",
     "needsReview": true
   },
   "video-production-04": {

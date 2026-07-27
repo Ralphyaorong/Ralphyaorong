@@ -37,6 +37,18 @@ async function createImage(source, destination, maxWidth, keepPng = false) {
   mapping.push({ source: relative(source), website: `/${path.relative(path.join(root, "public"), destination).split(path.sep).join("/")}` });
 }
 
+async function createQrCrop(source, destination) {
+  const metadata = await sharp(source).metadata();
+  const width = metadata.width ?? 844;
+  const height = metadata.height ?? 1207;
+  const side = Math.round(width * 0.59);
+  const left = Math.round(width * 0.205);
+  const top = Math.min(Math.round(height * 0.328), height - side);
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  await sharp(source).extract({ left, top, width: side, height: side }).png().toFile(destination);
+  mapping.push({ source: relative(source), website: `/${path.relative(path.join(root, "public"), destination).split(path.sep).join("/")}`, transformation: "cropped-to-qr" });
+}
+
 await fs.rm(publicAssets, { recursive: true, force: true });
 await fs.mkdir(publicAssets, { recursive: true });
 
@@ -44,13 +56,22 @@ const [hero] = await sourceList(sources.home);
 if (hero) await createImage(hero, path.join(publicAssets, "home", "hero.webp"), 2400);
 
 const [wechatQr] = await sourceList(sources.contact);
-if (wechatQr) await createImage(wechatQr, path.join(publicAssets, "contact", "wechat-qr.png"), 1600, true);
+if (wechatQr) await createQrCrop(wechatQr, path.join(publicAssets, "contact", "wechat-qr.png"));
 
 const photoFiles = await sourceList(sources.photography);
 for (const [index, file] of photoFiles.entries()) await createImage(file, path.join(publicAssets, "works", "photography", `photo-${String(index + 1).padStart(2, "0")}.webp`), 1600);
 
-const workflowFiles = await sourceList(sources.workflow);
-for (const [index, file] of workflowFiles.entries()) await createImage(file, path.join(publicAssets, "cases", "ai-workflow", `workflow-${String(index + 1).padStart(2, "0")}.png`), 2400, true);
+const workflowGroups = [
+  ["content-production", ["内容生产协同工作流 01-1.png", "内容生产协同工作流 02-2.png", "内容生产协同工作流 03-3.png"]],
+  ["media-operations", ["Ralph全媒体运营中心01-1.png", "Ralph全媒体运营中心01-2.png", "Ralph全媒体运营中心01-3.png"]],
+  ["content-compliance", ["全媒体内容发布前合规审查工作台01-1.png", "全媒体内容发布前合规审查工作台01-2.png", "全媒体内容发布前合规审查工作台01-3.png"]]
+];
+for (const [group, filenames] of workflowGroups) {
+  for (const [index, filename] of filenames.entries()) {
+    const source = path.join(root, "AI 工作流", filename);
+    await createImage(source, path.join(publicAssets, "cases", "ai-workflow", `${group}-${index + 1}.png`), 2400, true);
+  }
+}
 
 const ipFiles = await sourceList(sources.ip);
 for (const [index, file] of ipFiles.entries()) await createImage(file, path.join(publicAssets, "cases", "ip-projects", `project-${String(index + 1).padStart(2, "0")}.webp`), 1600);

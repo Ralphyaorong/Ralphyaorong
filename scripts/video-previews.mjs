@@ -11,13 +11,13 @@ const statePath = path.join(root, "video-previews-manifest.json");
 const generatedModule = path.join(root, "src", "data", "video-previews.ts");
 const outputRoot = path.join(root, "public", "assets", "works");
 const sources = [
-  ["video-production-01", "视频制作", "2026.6.12-Facebook广告-脚本4.mp4", "video-production"],
-  ["video-production-02", "视频制作", "BLVD_MASTER_UHD.mp4", "video-production"],
-  ["video-production-03", "视频制作", "facebook视频.mp4", "video-production"],
+  ["video-production-01", "视频制作", "商业视频制作项目 01 .mp4", "video-production"],
+  ["video-production-02", "视频制作", "社交媒体短视频项目 02.mp4", "video-production"],
+  ["video-production-03", "视频制作", "活动影像记录项目 03.mp4", "video-production"],
   ["video-production-04", "视频制作", "三岔湖-终.mp4", "video-production"],
   ["video-production-05", "视频制作", "白鹤滩-1.mp4", "video-production"],
-  ["video-packaging-01", "视频包装", "2026.4.20-Refinance只找一家银行，你可能白白少拿上百万.mp4", "video-packaging"],
-  ["video-packaging-02", "视频包装", "20264.16-澳版“跑路老板”😱2 billion帝国说崩就崩，他到底做错了什么.mp4", "video-packaging"]
+  ["video-packaging-01", "视频制作", "视频包装与节奏设计 01.mp4", "video-packaging"],
+  ["video-packaging-02", "视频制作", "品牌视觉包装项目 02.mp4", "video-packaging"]
 ];
 
 async function hasBinary(name) { try { await run(name, ["-version"], { windowsHide: true }); return true; } catch { return false; } }

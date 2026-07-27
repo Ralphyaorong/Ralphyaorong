@@ -5,7 +5,7 @@ import { publicAssets, root } from "./assets-shared.mjs";
 let failures = 0;
 const expected = [
   "home/hero.webp", "works/photography/photo-01.webp", "works/livestream/scene-01.webp",
-  "cases/ai-workflow/workflow-01.png", "cases/ip-projects/project-01.webp", "generated/video-production-01.svg"
+  "cases/ai-workflow/content-production-1.png", "cases/ip-projects/project-01.webp", "generated/video-production-01.svg"
 ];
 for (const relativePath of expected) {
   try { await fs.access(path.join(publicAssets, relativePath)); } catch { console.error(`Missing expected website asset: ${relativePath}`); failures += 1; }
