@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+AI 工作流/
+IP案例/
+备用/
+视频包装/
+视频制作/
+挑选照片6张/
+直播间案例/
+首页照片.png
+二维码.png
+assets-manifest.json
+content-draft.json
+content-review.md
+video-previews-manifest.json

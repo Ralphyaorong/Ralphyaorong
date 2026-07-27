@@ -1,0 +1,33 @@
+{
+  "name": "ralph-studio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out",
+    "lint": "next lint",
+    "assets:scan": "node scripts/assets-scan.mjs",
+    "assets:videos": "node scripts/video-previews.mjs",
+    "content:generate": "node scripts/content-generate.mjs",
+    "assets:prepare": "node scripts/assets-prepare.mjs && node scripts/video-previews.mjs && node scripts/content-generate.mjs",
+    "assets:check": "node scripts/assets-check.mjs"
+  },
+  "dependencies": {
+    "@types/node": "22.10.5",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "next": "15.5.9",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "sharp": "0.33.5"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.20",
+    "eslint": "9.17.0",
+    "eslint-config-next": "15.1.2",
+    "postcss": "8.4.49",
+    "tailwindcss": "3.4.16",
+    "typescript": "5.7.2"
+  }
+}
