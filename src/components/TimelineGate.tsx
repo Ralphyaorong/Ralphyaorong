@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { SubpageHero } from "@/components/SubpageHero";
 
 type TimelineItem = { time: string; title: string; role: string; text: string; relation?: string };
 
@@ -22,6 +23,7 @@ export function TimelineGate() {
   const [error, setError] = useState("");
   useEffect(() => { setUnlocked(sessionStorage.getItem(storageKey) === "granted"); }, []);
   function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (value === password) { sessionStorage.setItem(storageKey, "granted"); setUnlocked(true); setError(""); return; } setError("密钥不正确，请重新输入。"); }
-  if (!unlocked) return <section className="timeline-gate page"><div className="timeline-gate__inner"><p className="eyebrow">PRIVATE TIMELINE</p><h1>个人发展时间轴</h1><p>此页面包含个人经历整理，请输入访问密钥后查看。</p><form onSubmit={submit}><label htmlFor="timeline-password">访问密钥</label><div><input id="timeline-password" type="password" value={value} onChange={(event) => setValue(event.target.value)} autoComplete="current-password" required /><button className="button button--primary" type="submit">进入时间轴</button></div><p className="timeline-gate__error" aria-live="polite">{error}</p></form></div></section>;
-  return <section className="timeline-page page"><header className="timeline-intro"><p className="eyebrow">DEVELOPMENT TIMELINE</p><h1>个人发展时间轴</h1><p>从技术执行、影像创作到 AI 内容工作流搭建，一段持续靠近“创意、执行与工具链协同”的实践路径。</p></header><div className="timeline-list">{timeline.map((item, index) => <article className={`timeline-item${item.relation ? " timeline-item--parallel" : ""}`} key={item.time}><div className="timeline-item__time">{item.time}</div><div className="timeline-item__marker" aria-hidden="true"><span>{String(index + 1).padStart(2, "0")}</span></div><div className="timeline-item__content"><p className="eyebrow">{item.role}</p>{item.relation && <span className="timeline-item__relation">{item.relation}</span>}<h2>{item.title}</h2><p>{item.text}</p></div></article>)}</div></section>;
+  const hero = <SubpageHero eyebrow="DEVELOPMENT TIMELINE" title="个人发展时间轴" description="从技术执行、影像创作到 AI 内容工作流搭建，一段持续靠近创意、执行与工具链协同的实践路径。" image="/assets/generated/page-hero-timeline.webp" alt="Ralph Studio 整理个人创作历程中的影像档案" />;
+  if (!unlocked) return <>{hero}<section className="timeline-gate page page--after-hero"><div className="timeline-gate__inner"><p>此页面包含个人经历整理，请输入访问密钥后查看。</p><form onSubmit={submit}><label htmlFor="timeline-password">访问密钥</label><div><input id="timeline-password" type="password" value={value} onChange={(event) => setValue(event.target.value)} autoComplete="current-password" required /><button className="button button--primary" type="submit">进入时间轴</button></div><p className="timeline-gate__error" aria-live="polite">{error}</p></form></div></section></>;
+  return <>{hero}<section className="timeline-page page page--after-hero"><div className="timeline-list">{timeline.map((item, index) => <article className={`timeline-item${item.relation ? " timeline-item--parallel" : ""}`} key={item.time}><div className="timeline-item__time">{item.time}</div><div className="timeline-item__marker" aria-hidden="true"><span>{String(index + 1).padStart(2, "0")}</span></div><div className="timeline-item__content"><p className="eyebrow">{item.role}</p>{item.relation && <span className="timeline-item__relation">{item.relation}</span>}<h2>{item.title}</h2><p>{item.text}</p></div></article>)}</div></section></>;
 }

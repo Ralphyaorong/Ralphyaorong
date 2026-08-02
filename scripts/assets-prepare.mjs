@@ -12,6 +12,57 @@ const sources = {
   livestream: ["直播间案例"]
 };
 const mapping = [];
+const generatedHeroNames = ["works", "cases", "about", "contact", "timeline"];
+const generatedVideoPreviewGroups = [
+  ["video-production", 5],
+  ["video-packaging", 2]
+];
+
+async function optionalFile(pathname) {
+  try {
+    return await fs.readFile(pathname);
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function preserveGeneratedPageHeroes() {
+  const heroes = new Map();
+  for (const name of generatedHeroNames) {
+    const webpPath = path.join(publicAssets, "generated", `page-hero-${name}.webp`);
+    const pngPath = path.join(publicAssets, "generated", `page-hero-${name}.png`);
+    const existingWebp = await optionalFile(webpPath);
+    if (existingWebp) {
+      heroes.set(name, existingWebp);
+      continue;
+    }
+    const existingPng = await optionalFile(pngPath);
+    if (existingPng) {
+      heroes.set(name, await sharp(existingPng).rotate().webp({ quality: 82 }).toBuffer());
+    }
+  }
+  return heroes;
+}
+
+const preservedGeneratedPageHeroes = await preserveGeneratedPageHeroes();
+
+async function preserveGeneratedVideoPreviews() {
+  const previews = new Map();
+  for (const [group, count] of generatedVideoPreviewGroups) {
+    for (let index = 1; index <= count; index += 1) {
+      const filename = `${group}-${String(index).padStart(2, "0")}`;
+      for (const extension of ["mp4", "webp"]) {
+        const relativePath = path.join("works", group, `${filename}.${extension}`);
+        const existing = await optionalFile(path.join(publicAssets, relativePath));
+        if (existing) previews.set(relativePath, existing);
+      }
+    }
+  }
+  return previews;
+}
+
+const preservedGeneratedVideoPreviews = await preserveGeneratedVideoPreviews();
 
 async function sourceList(names) {
   const results = [];
@@ -94,6 +145,16 @@ for (const type of ["video-production", "video-packaging"]) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900"><rect width="1600" height="900" fill="#131a1e"/><path d="M120 690H1480M120 210H1480" stroke="#d5c09b" stroke-opacity=".34"/><path d="M800 365l115 85-115 85z" fill="#d5c09b"/><text x="120" y="150" fill="#f2f3f1" font-family="Arial, sans-serif" font-size="38" letter-spacing="8">RALPH STUDIO</text><text x="120" y="770" fill="#9ea6a8" font-family="Arial, sans-serif" font-size="28" letter-spacing="4">WORK SAMPLE / PREVIEW PENDING</text></svg>`;
     await fs.writeFile(path.join(posterDir, filename), svg);
   }
+}
+
+for (const [name, image] of preservedGeneratedPageHeroes) {
+  await fs.writeFile(path.join(posterDir, `page-hero-${name}.webp`), image);
+}
+
+for (const [relativePath, preview] of preservedGeneratedVideoPreviews) {
+  const destination = path.join(publicAssets, relativePath);
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  await fs.writeFile(destination, preview);
 }
 
 await fs.writeFile(path.join(root, "assets-manifest.json"), `${JSON.stringify({ generatedAt: new Date().toISOString(), mapping, notes: ["Video sources are intentionally excluded because FFmpeg is unavailable and source files exceed the website limit.", "The backup folder is not copied or displayed."] }, null, 2)}\n`);
