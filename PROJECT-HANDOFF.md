@@ -80,6 +80,8 @@ git status
 
 已处理并可部署的封面、流程图、截图与二维码在 `public/assets/` 中；页面数据在 `src/data/` 中。
 
+子页面场景首图位于 `public/assets/generated/page-hero-*.webp`：作品、案例、关于、联系和个人发展时间轴各一张。它们对应页面实际工作场景，并与首页人物和低饱和电影感保持一致。
+
 ## 5. 更新内容的位置
 
 | 需求 | 修改位置 |
@@ -170,8 +172,8 @@ gh run list --repo Ralphyaorong/Ralphyaorong --workflow deploy-pages.yml --limit
 
 ## 9. 当前上线版本
 
-- 当前提交：`299639c`（Polish cinematic motion and system visuals）
-- 当前标签：`cinematic-systems-v1`
+- 当前提交：`53684ad`（Add scenario-based subpage hero imagery）
+- 当前标签：`subpage-scenario-heroes-v1`
 - 当前部署地址：<https://ralphyaorong.github.io/Ralphyaorong/>
 
 每次更新后，至少检查：首页、作品列表、一个作品详情、案例列表、一个 AI 工作流详情、联系页和移动端菜单。若线上资源未立即更新，等待 GitHub Actions 完成后刷新页面即可。
