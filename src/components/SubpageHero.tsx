@@ -6,11 +6,12 @@ type SubpageHeroProps = {
   description: string;
   image: string;
   alt: string;
+  className?: string;
 };
 
-export function SubpageHero({ eyebrow, title, description, image, alt }: SubpageHeroProps) {
+export function SubpageHero({ eyebrow, title, description, image, alt, className }: SubpageHeroProps) {
   return (
-    <section className="subpage-hero">
+    <section className={`subpage-hero${className ? ` ${className}` : ""}`}>
       <img src={assetUrl(image)} alt={alt} loading="eager" fetchPriority="high" decoding="sync" />
       <div className="subpage-hero__shade" aria-hidden="true" />
       <div className="subpage-hero__content">
