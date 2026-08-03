@@ -35,7 +35,7 @@ export const videoPreviews: Record<string, VideoPreview> = {
   "video-packaging-01": {
     "previewVideo": "/assets/works/video-packaging/video-packaging-01.mp4",
     "poster": "/assets/works/video-packaging/video-packaging-01.webp",
-    "previewDurationLabel": "25 秒作品节选",
+    "previewDurationLabel": "15 秒作品节选",
     "needsReview": true
   },
   "video-packaging-02": {

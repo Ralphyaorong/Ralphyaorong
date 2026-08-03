@@ -19,6 +19,12 @@ const sources = [
   ["video-packaging-01", "视频制作", "视频包装与节奏设计 01.mp4", "video-packaging"],
   ["video-packaging-02", "视频制作", "活动影像记录项目 03.mp4", "video-packaging"]
 ];
+// Some portfolio items need a deliberate opening excerpt instead of the
+// default content-aware segment selection. Keep this configuration explicit
+// so rerunning the asset pipeline preserves the editorial decision.
+const fixedPreviewDurations = new Map([
+  ["video-packaging-01", 15]
+]);
 
 async function hasBinary(name) { try { await run(name, ["-version"], { windowsHide: true }); return true; } catch { return false; } }
 async function probe(file) { const { stdout } = await run(ffprobe, ["-v", "error", "-select_streams", "v:0", "-show_entries", "format=duration:stream=width,height", "-of", "json", file], { windowsHide: true }); const data = JSON.parse(stdout); const stream = data.streams?.[0]; return { duration: Number(data.format?.duration ?? 0), width: Number(stream?.width ?? 0), height: Number(stream?.height ?? 0) }; }
@@ -34,11 +40,11 @@ const prior = JSON.parse(await fs.readFile(statePath, "utf8").catch(() => "{\"re
 const priorById = new Map((prior.records ?? []).map((record) => [record.id, record]));
 const records = [];
 for (const [id, folder, filename, outputFolder] of sources) {
-  const input = path.join(root, folder, filename); const stat = await fs.stat(input); const output = path.join(outputRoot, outputFolder, `${id}.mp4`); const cover = path.join(outputRoot, outputFolder, `${id}.webp`); const old = priorById.get(id); const base = { id, sourcePath: path.relative(root, input).split(path.sep).join("/"), sourceSizeBytes: stat.size, sourceSizeMB: bytesToMB(stat.size), sourceModifiedMs: stat.mtimeMs, outputPath: publicPath(output), coverPath: publicPath(cover), needsReview: true };
-  if (old?.sourcePath === base.sourcePath && old?.sourceSizeBytes === stat.size && old?.sourceModifiedMs === stat.mtimeMs && (old.status === "processed" || old.status === "skipped-unchanged") && await fs.access(output).then(() => true).catch(() => false) && await fs.access(cover).then(() => true).catch(() => false)) { records.push({ ...old, status: "skipped-unchanged" }); continue; }
+  const input = path.join(root, folder, filename); const stat = await fs.stat(input); const output = path.join(outputRoot, outputFolder, `${id}.mp4`); const cover = path.join(outputRoot, outputFolder, `${id}.webp`); const old = priorById.get(id); const fixedDuration = fixedPreviewDurations.get(id); const fixedSelectionUnchanged = !fixedDuration || (old?.previewStartSeconds === 0 && Math.abs((old?.previewEndSeconds ?? 0) - Math.min(fixedDuration, old?.sourceDurationSeconds ?? fixedDuration)) < 0.1); const base = { id, sourcePath: path.relative(root, input).split(path.sep).join("/"), sourceSizeBytes: stat.size, sourceSizeMB: bytesToMB(stat.size), sourceModifiedMs: stat.mtimeMs, outputPath: publicPath(output), coverPath: publicPath(cover), needsReview: true };
+  if (old?.sourcePath === base.sourcePath && old?.sourceSizeBytes === stat.size && old?.sourceModifiedMs === stat.mtimeMs && fixedSelectionUnchanged && (old.status === "processed" || old.status === "skipped-unchanged") && await fs.access(output).then(() => true).catch(() => false) && await fs.access(cover).then(() => true).catch(() => false)) { records.push({ ...old, status: "skipped-unchanged" }); continue; }
   if (!ffmpegAvailable) { records.push({ ...base, status: "unavailable", reason: "FFmpeg and FFprobe are not available; no preview or cover was generated." }); continue; }
   try {
-    const media = await probe(input); if (!Number.isFinite(media.duration) || media.duration <= 0) throw new Error("Unable to read a valid video duration."); const previewDuration = Math.min(25, media.duration); const start = await chooseStart(input, media.duration, previewDuration); await fs.mkdir(path.dirname(output), { recursive: true }); const tempOutput = `${output}.tmp.mp4`;
+    const media = await probe(input); if (!Number.isFinite(media.duration) || media.duration <= 0) throw new Error("Unable to read a valid video duration."); const previewDuration = Math.min(fixedDuration ?? 25, media.duration); const start = fixedDuration ? 0 : await chooseStart(input, media.duration, previewDuration); await fs.mkdir(path.dirname(output), { recursive: true }); const tempOutput = `${output}.tmp.mp4`;
     await run(ffmpeg, ["-y", "-ss", start.toFixed(2), "-i", input, "-t", previewDuration.toFixed(2), "-vf", scaleFilter(media.width, media.height), "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-pix_fmt", "yuv420p", "-c:a", "aac", "-movflags", "+faststart", tempOutput], { windowsHide: true }); await fs.rename(tempOutput, output);
     const coverTime = Math.min(start + 2, Math.max(0, media.duration - 0.1)); await run(ffmpeg, ["-y", "-ss", coverTime.toFixed(2), "-i", input, "-frames:v", "1", "-vf", scaleFilter(media.width, media.height), "-q:v", "4", cover], { windowsHide: true }); const outputStat = await fs.stat(output);
     records.push({ ...base, sourceDurationSeconds: media.duration, dimensions: `${media.width}x${media.height}`, previewStartSeconds: start, previewEndSeconds: Math.min(start + previewDuration, media.duration), outputSizeBytes: outputStat.size, outputSizeMB: bytesToMB(outputStat.size), coverSelectionSeconds: coverTime, status: "processed" });
