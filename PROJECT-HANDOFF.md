@@ -80,7 +80,9 @@ git status
 
 已处理并可部署的封面、流程图、截图与二维码在 `public/assets/` 中；页面数据在 `src/data/` 中。
 
-子页面场景首图位于 `public/assets/generated/page-hero-*.webp`：作品、案例、关于、联系和个人发展时间轴各一张。它们对应页面实际工作场景，并与首页人物和低饱和电影感保持一致。
+子页面场景首图位于 `public/assets/generated/page-hero-*.webp`：作品、案例、关于、联系和个人发展时间轴各一张。它们对应页面实际工作场景，并与首页人物和低饱和电影感保持一致。时间轴正文的低对比底图为 `public/assets/generated/page-timeline-background.webp`；素材整理脚本会保留这些已生成资源，不会在重新执行 `npm run assets:prepare` 时清除它们。
+
+个人发展时间轴的访问门槛仅是浏览器端交互，作用是避免页面入口被随手浏览；它不是安全保护机制，不应在该页面或仓库中放入真正的私密信息。
 
 ## 5. 更新内容的位置
 
@@ -124,7 +126,12 @@ git push origin main
 当前保留的关键回滚标签：
 
 - `pre-cinematic-systems-20260728`：电影感动效升级前的稳定版本
-- `cinematic-systems-v1`：当前电影感与工作流系统视觉版本
+- `cinematic-systems-v1`：电影感与工作流系统视觉版本
+- `subpage-scenario-heroes-v1`：首轮子页面场景横幅版本
+- `video-packaging-15s-v1`：视频包装项目预览固定为原片前 15 秒
+- `stylized-subpage-heroes-v2`：案例、关于、联系、时间轴的去正脸风格化横幅
+- `timeline-readable-background-v1`：时间轴正文底图与文字可读性版本
+- `works-hero-headroom-v1`：作品页横幅头部完整取景版本
 
 查看标签和提交：
 
@@ -170,10 +177,18 @@ gh run list --repo Ralphyaorong/Ralphyaorong --workflow deploy-pages.yml --limit
 
 不要手动给图片或内部链接拼接仓库名前缀。页面使用 `assetUrl()` 与 Next.js 的 `basePath` 配置，在本地与 Actions 环境间自动适配。
 
-## 9. 当前上线版本
+## 9. 当前上线进度（2026-08-03）
 
-- 当前提交：`53684ad`（Add scenario-based subpage hero imagery）
-- 当前标签：`subpage-scenario-heroes-v1`
+- 当前提交：`08783c8`（Keep creator head visible in works hero）
+- 当前标签：`works-hero-headroom-v1`
 - 当前部署地址：<https://ralphyaorong.github.io/Ralphyaorong/>
+- 部署分支：`main`；GitHub Pages 由 Actions 自动发布。
 
-每次更新后，至少检查：首页、作品列表、一个作品详情、案例列表、一个 AI 工作流详情、联系页和移动端菜单。若线上资源未立即更新，等待 GitHub Actions 完成后刷新页面即可。
+已完成的近期更新：
+
+1. 作品页横幅改为清理过文字的创作者拍摄场景，并单独调整裁切锚点，保证人物头部完整显示；首页与作品页之外的页面不使用该正脸构图。
+2. 案例、关于、联系、时间轴四个子页使用按页面功能设计的本地 WebP 横幅：流程系统、工作台背影、雨夜联系桌面、影像档案序列；整体保持暗青黑与低饱和暖金色调。
+3. 时间轴解锁后的正文增加了专用低对比档案底图、深色遮罩与文字阴影，保证正文和节点在桌面与手机上清晰可读。
+4. `视频包装与节奏设计 01` 的网页预览固定为原视频前 15 秒，输出为 H.264/AAC、1280×720、约 5.25MB；原始视频未被修改。
+
+每次更新后，至少检查：首页、作品列表、一个作品详情、案例列表、一个 AI 工作流详情、时间轴解锁后的正文、联系页和移动端菜单。若线上资源未立即更新，等待 GitHub Actions 完成后刷新页面即可。

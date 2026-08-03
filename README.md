@@ -4,6 +4,8 @@
 
 Ralph Studio 是一个完全静态的个人作品展示网站，聚焦视频制作、后期剪辑、直播间基础搭建与 AI 内容工作流实践。页面中的项目名称均为匿名通用名称，原始素材文件名和内部业务信息不会在前台展示。
 
+跨电脑维护、当前上线进度、回滚标签和部署检查请优先阅读 [PROJECT-HANDOFF.md](PROJECT-HANDOFF.md)。
+
 ## 技术栈
 
 - Next.js App Router、TypeScript（严格模式）、Tailwind CSS
@@ -58,9 +60,9 @@ npm run build
 
 ## 大视频说明
 
-当前环境没有检测到 FFmpeg，且原始视频多数超过 25MB（部分超过 GitHub 单文件限制）。脚本不会把这些视频复制进 `public/`，而是生成本地“作品节选待补充”封面，防止部署仓库膨胀或资源加载失败。
+仓库已包含处理后的网页预览视频和 WebP 封面；原始视频多数超过 25MB（部分超过 GitHub 单文件限制），绝不能直接复制到 `public/` 或提交。当前“视频包装与节奏设计 01”的预览固定为原片前 15 秒，其余项目按脚本中的节选规则处理。
 
-安装 FFmpeg 后，运行 `npm run assets:videos` 或 `npm run assets:prepare`。脚本会生成 H.264 MP4、AAC 音频、yuv420p、faststart 的 20–30 秒节选与 WebP 封面；自动跳过未修改的视频，并将处理状态、时间点、输入输出大小和失败原因记录在 `video-previews-manifest.json`。不要提交原始大视频。
+安装 FFmpeg 后，运行 `npm run assets:videos` 或 `npm run assets:prepare`。脚本会生成 H.264 MP4、AAC 音频、yuv420p、faststart 的网页预览与 WebP 封面；默认节选为 20–30 秒，项目有明确固定时长配置时以配置为准。脚本会自动跳过未修改的视频，并将处理状态、时间点、输入输出大小和失败原因记录在 `video-previews-manifest.json`。不要提交原始大视频。
 
 如果 FFmpeg 不在系统 `PATH`，可临时指定可执行文件路径（PowerShell）：
 
