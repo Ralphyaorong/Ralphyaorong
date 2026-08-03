@@ -13,6 +13,7 @@ const sources = {
 };
 const mapping = [];
 const generatedHeroNames = ["works", "cases", "about", "contact", "timeline"];
+const generatedStandaloneFiles = ["page-timeline-background.webp"];
 const generatedVideoPreviewGroups = [
   ["video-production", 5],
   ["video-packaging", 2]
@@ -46,6 +47,17 @@ async function preserveGeneratedPageHeroes() {
 }
 
 const preservedGeneratedPageHeroes = await preserveGeneratedPageHeroes();
+
+async function preserveGeneratedStandaloneFiles() {
+  const files = new Map();
+  for (const filename of generatedStandaloneFiles) {
+    const existing = await optionalFile(path.join(publicAssets, "generated", filename));
+    if (existing) files.set(filename, existing);
+  }
+  return files;
+}
+
+const preservedGeneratedStandaloneFiles = await preserveGeneratedStandaloneFiles();
 
 async function preserveGeneratedVideoPreviews() {
   const previews = new Map();
@@ -149,6 +161,10 @@ for (const type of ["video-production", "video-packaging"]) {
 
 for (const [name, image] of preservedGeneratedPageHeroes) {
   await fs.writeFile(path.join(posterDir, `page-hero-${name}.webp`), image);
+}
+
+for (const [filename, image] of preservedGeneratedStandaloneFiles) {
+  await fs.writeFile(path.join(posterDir, filename), image);
 }
 
 for (const [relativePath, preview] of preservedGeneratedVideoPreviews) {
